@@ -162,15 +162,15 @@ class VoiceSelectorView : UIView {
     midLine.stroke()
   }
   
-  func getTextAttributes(fontSize: CGFloat, textColor: UIColor) -> [String: AnyObject] {
+  func getTextAttributes(fontSize: CGFloat, textColor: UIColor) -> [NSAttributedString.Key: Any] {
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.alignment = .center
-    var textAttributes: [String: AnyObject] = [
-      NSForegroundColorAttributeName: textColor,
-      NSParagraphStyleAttributeName: paragraphStyle
+    var textAttributes: [NSAttributedString.Key: Any] = [
+         .foregroundColor: textColor,
+         .paragraphStyle: paragraphStyle
     ]
     if let font = UIFont(name: "MarkerFelt-Thin", size: fontSize) {
-      textAttributes[NSFontAttributeName] = font
+        textAttributes[.font] = font
     }
     return textAttributes
   }
@@ -238,13 +238,13 @@ class VoiceSelectorView : UIView {
   func drawLoadingString(text: String, rect: CGRect, fontSize: CGFloat) {
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.alignment = .center
-    var textAttributes: [String: AnyObject]
-    textAttributes = [
-      NSForegroundColorAttributeName: loadingTextColor,
-      NSParagraphStyleAttributeName: paragraphStyle
-    ]
+ 
+      var textAttributes: [NSAttributedString.Key: Any] = [
+           .foregroundColor: loadingTextColor,
+           .paragraphStyle: paragraphStyle
+      ]
     if let font = UIFont(name: "MarkerFelt-Thin", size: fontSize) {
-      textAttributes[NSFontAttributeName] = font
+        textAttributes[.font] = font
     }
     text.draw(in: rect, withAttributes: textAttributes)
   }

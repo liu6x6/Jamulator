@@ -4,6 +4,9 @@
 
 import UIKit
 import AudioKit
+import AudioKitUI
+import AVFAudio
+import Accelerate
 
 class MIDIInstrumentViewController: UIViewController {
 
@@ -22,7 +25,8 @@ class MIDIInstrumentViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    self.view.backgroundColor = backgroundColor
+    view.backgroundColor = backgroundColor
+      
     voiceSelectorView = VoiceSelectorView(frame:
       ScreenUtils.resizeRect(rect: CGRect(x: 40, y: 200, width: 640, height: 160)), synth: synth)
     setSpeakersAsDefaultAudioOutput()
@@ -31,7 +35,7 @@ class MIDIInstrumentViewController: UIViewController {
     // cover up garbage on the right side of AKKeyboardView
     let coverUp = UIView(frame: ScreenUtils.resizeRect(rect: CGRect(x: 679, y: 0, width: 100, height: 150)))
     coverUp.backgroundColor = self.view.backgroundColor
-    self.view.addSubview(coverUp)
+    view.addSubview(coverUp)
     
     setUpOctaveControl()
   
@@ -49,12 +53,12 @@ class MIDIInstrumentViewController: UIViewController {
   // work around for when some devices only play through the headphone jack
   func setSpeakersAsDefaultAudioOutput() {
     do {
-      try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, with: AVAudioSessionCategoryOptions.defaultToSpeaker)
-    }
-    catch {
+        let audioSession = AVAudioSession.sharedInstance()
+        try audioSession.setCategory(AVAudioSession.Category.playAndRecord, options: .defaultToSpeaker)
+    } catch {
       // hard to imagine how we'll get this exception
-      let alertController = UIAlertController(title: "Speaker Problem", message: "You may be able to hear sound using headphones.", preferredStyle: UIAlertControllerStyle.alert)
-      let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default) {
+        let alertController = UIAlertController(title: "Speaker Problem", message: "You may be able to hear sound using headphones.", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: UIAlertAction.Style.default) {
         (result: UIAlertAction) -> Void in
       }
       
@@ -67,14 +71,14 @@ class MIDIInstrumentViewController: UIViewController {
   // the protocol extension is at the bottom of this file
   // all we have to provide is a noteOn method and a noteOff method
   func setUpPianoKeyboard() {
-    let keyboard = AKKeyboardView(frame: ScreenUtils.resizeRect(
+    let keyboard = KeyboardView(frame: ScreenUtils.resizeRect(
       rect: CGRect(x: 40, y: 0, width: 687, height: 150)))
     keyboard.delegate = self
     keyboard.polyphonicMode = true // allow more than one note at a time
     keyboard.keyOnColor = keyOnColor
     keyboard.whiteKeyOff = whiteKeyOffColor
     keyboard.blackKeyOff = blackKeyOffColor
-    self.view.addSubview(keyboard)
+    view.addSubview(keyboard)
   }
   
   func setUpOctaveControl() {
@@ -82,14 +86,15 @@ class MIDIInstrumentViewController: UIViewController {
     octaveLabel.text = "Octave"
     octaveLabel.textColor = labelTextColor
     octaveLabel.font = ScreenUtils.getAdjustedFont()
-    self.view.addSubview(octaveLabel)
+    
+    view.addSubview(octaveLabel)
     chooseOctaveControl.selectedSegmentIndex = synth.octave - 1
     chooseOctaveControl.frame = ScreenUtils.resizeRect(rect: CGRect(x: 200, y: 170, width: 320, height: 20))
     chooseOctaveControl.layer.cornerRadius = 5.0
     chooseOctaveControl.backgroundColor = labelTextColor
     chooseOctaveControl.tintColor = blackKeyOffColor
     chooseOctaveControl.addTarget(self, action: #selector(MIDIInstrumentViewController.changeOctave(_:)), for: .valueChanged)
-    self.view.addSubview(chooseOctaveControl)
+    view.addSubview(chooseOctaveControl)
   }
   
   // a sequencer can record what you play, then play it back
@@ -149,7 +154,7 @@ class MIDIInstrumentViewController: UIViewController {
 
 // MARK: - AKKeyboardDelegate
 // the protocol for the piano keyboard needs methods to turn notes on and off
-extension MIDIInstrumentViewController: AKKeyboardDelegate {
+extension MIDIInstrumentViewController: KeyboardDelegate {
   
   func noteOn(note: MIDINoteNumber) {
     synth.playNoteOn(channel: 0, note: note, midiVelocity: 127)

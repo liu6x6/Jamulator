@@ -4,11 +4,12 @@
 
 import CoreAudio
 import AudioKit
+import AudioKitUI
+import AudioToolbox
 
 final class SoftSynth : AudioCommon {
-  override init()
-  {
-    super.init()
+  override init(){
+      super.init()
     initAudio()
     loadSoundFont()
     loadPatch(patchNo: 0)
